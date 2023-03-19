@@ -1,0 +1,35 @@
+version: "3.5"
+
+networks:
+  net:
+    driver: bridge
+
+services:
+
+  # database
+  postgres:
+    image: postgres:alpine3.16
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    container_name: 'postgres-container'
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    networks:
+      - net
+
+  # service
+  app:
+    build: ./
+    command: ./wait-for-postgres.sh postgres ./auth-service
+    container_name: 'auth-service-container'
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    networks:
+      - net

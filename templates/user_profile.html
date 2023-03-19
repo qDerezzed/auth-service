@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  color: #000;
+  background-color: #f8f8f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+</style>
+</head>
+
+<h1>Вы в системе</h1>
+<p>Ваш логин: {{ .Login}}</p>
+<p>Ваш e-mail: {{ .Email}}</p>
+<p>Ваш телефон: {{ .PhoneNumber}}</p>
+
+<a href="/v1/auth/logout">Выйти</a>
+
+</body>
+</html>
