@@ -9,7 +9,7 @@ import (
 	"auth-service/internal/usecase"
 )
 
-func NewRouter(handler *gin.Engine, uc usecase.AuthUseCase) {
+func NewRouter(handler *gin.Engine, uc usecase.Auth) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())

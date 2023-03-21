@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -14,10 +13,10 @@ import (
 )
 
 type authRoutes struct {
-	uc usecase.AuthUseCase
+	uc usecase.Auth
 }
 
-func newAuthRoutes(handler *gin.RouterGroup, uc usecase.AuthUseCase) {
+func newAuthRoutes(handler *gin.RouterGroup, uc usecase.Auth) {
 	r := &authRoutes{uc}
 
 	h := handler.Group("/auth")
@@ -35,6 +34,7 @@ func newAuthRoutes(handler *gin.RouterGroup, uc usecase.AuthUseCase) {
 }
 
 func (r *authRoutes) register(c *gin.Context) {
+	c.Writer.Header().Set("Cache-Control", "no-store")
 	type RequestUser struct {
 		Login       string `form:"login" binding:"required"`
 		Email       string `form:"email" binding:"required"`
@@ -68,6 +68,8 @@ func (r *authRoutes) register(c *gin.Context) {
 }
 
 func (r *authRoutes) login(c *gin.Context) {
+	c.Writer.Header().Set("Cache-Control", "no-store")
+
 	type RequestUser struct {
 		Login    string `form:"login" binding:"required"`
 		Password string `form:"password" binding:"required"`
@@ -112,6 +114,8 @@ func (r *authRoutes) login(c *gin.Context) {
 }
 
 func (r *authRoutes) userProfile(c *gin.Context) {
+	c.Writer.Header().Set("Cache-Control", "no-store")
+
 	cookie, err := c.Request.Cookie("session_id")
 	if err != nil {
 		log.Println(err.Error())
@@ -140,6 +144,8 @@ func (r *authRoutes) userProfile(c *gin.Context) {
 }
 
 func (r *authRoutes) logout(c *gin.Context) {
+	c.Writer.Header().Set("Cache-Control", "no-store")
+
 	cookie, _ := c.Request.Cookie("session_id")
 	login, err := r.uc.GetLogin(c.Request.Context(), cookie.Value)
 	if err != nil {
@@ -161,6 +167,8 @@ func (r *authRoutes) logout(c *gin.Context) {
 }
 
 func (r *authRoutes) loginGet(c *gin.Context) {
+	c.Writer.Header().Set("Cache-Control", "no-store")
+
 	cookie, err := c.Request.Cookie("session_id")
 	if err == nil {
 		expireDate, err := r.uc.GetExpire(c.Request.Context(), cookie.Value)
@@ -170,7 +178,7 @@ func (r *authRoutes) loginGet(c *gin.Context) {
 			c.HTML(http.StatusOK, "login.html", nil)
 			return
 		}
-		fmt.Printf("expireDate.After(time.Now()): %v\n", expireDate.After(time.Now()))
+		//fmt.Printf("expireDate.After(time.Now()): %v\n", expireDate.After(time.Now()))
 		if expireDate.After(time.Now()) {
 			// кука валидна
 			location := url.URL{Path: "/v1/auth/user_profile"}

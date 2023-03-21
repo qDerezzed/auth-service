@@ -51,7 +51,7 @@ func (uc *AuthUseCase) CheckCreds(ctx context.Context, user *entities.User) (boo
 	}
 	isValid, err := checkPass(dbPassword, user.Password)
 	if err != nil {
-		return false, fmt.Errorf("AuthUseCase - CheckCreds - uc.IsValidCreds: %w", err)
+		return false, fmt.Errorf("AuthUseCase - CheckCreds - uc.checkPass: %w", err)
 	}
 	return isValid, nil
 }
@@ -73,20 +73,6 @@ func (uc *AuthUseCase) GenerateCookie(ctx context.Context, user *entities.User) 
 		return "", fmt.Errorf("AuthUseCase - GenerateCookie - uc.AddSession: %w", err)
 	}
 	return sessionID, nil
-}
-
-func (uc *AuthUseCase) isValidCreds(ctx context.Context, login string, inputPassword string) (bool, error) {
-	dbPassword, err := uc.repo.GetPassword(ctx, login)
-	if err != nil {
-		return false, entities.ErrNotValidLoginOrPass
-	}
-
-	isValid, err := checkPass(dbPassword, inputPassword)
-	if err != nil {
-		return false, err
-	}
-
-	return isValid, nil
 }
 
 func (uc *AuthUseCase) addUser(ctx context.Context, user *entities.User) error {
